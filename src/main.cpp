@@ -40,9 +40,11 @@ String tagId;
 #define CHARACTERISTIC_UUID "00002a19-0000-1000-8000-00805f9b34fb"
 
 // I2C ピン (XIAO ESP32C3)
-// D4/D5 のGPIO番号を明示的に指定
-#define SDA_PIN 6  // D4 = GPIO6
-#define SCL_PIN 7  // D5 = GPIO7
+// 複数のピン組み合わせを試す準備
+// Option 1: GPIO5(SDA), GPIO6(SCL) - デフォルト
+// Option 2: GPIO6(SDA), GPIO7(SCL) - 元の設定
+#define SDA_PIN 5  // D4 = GPIO5 (SDA)
+#define SCL_PIN 6  // D5 = GPIO6 (SCL)
 
 // サンプリング間隔
 #define SAMPLE_RATE_HZ 50  // 100Hz → 50Hz に下げる（I2C負荷軽減）
