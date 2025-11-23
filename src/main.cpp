@@ -293,11 +293,19 @@ MotionEvent detectMotion(IMUData* current, IMUData* baseline) {
                      current->gy * current->gy + 
                      current->gz * current->gz);
 
-  // デバッグ出力
+  // デバッグ出力（毎秒）
   static unsigned long lastDebugTime = 0;
   if (millis() - lastDebugTime > 1000) {
-    Serial.printf("angle=%.1f accel=%.2fg speed=%.1fdeg/s\n", 
-                  angleDelta, accelNorm, speed);
+    Serial.println("--- MPU6050 Data ---");
+    Serial.printf("Accel: X=%.2fg Y=%.2fg Z=%.2fg (Norm=%.2fg)\n", 
+                  current->ax, current->ay, current->az, accelNorm);
+    Serial.printf("Gyro:  X=%.1f° Y=%.1f° Z=%.1f° (Speed=%.1f°/s)\n", 
+                  current->gx, current->gy, current->gz, speed);
+    Serial.printf("Angle: Pitch=%.1f° Roll=%.1f° (Delta=%.1f°)\n", 
+                  current->pitch, current->roll, angleDelta);
+    Serial.printf("Baseline: Pitch=%.1f° Roll=%.1f°\n", 
+                  baseline->pitch, baseline->roll);
+    Serial.println("--------------------");
     lastDebugTime = millis();
   }
 
