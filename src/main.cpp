@@ -180,20 +180,26 @@ void setup() {
   }
 
   // MPU6050 設定
+  Serial.println("Step 4: Configuring MPU6050...");
   mpu.setAccelerometerRange(MPU6050_RANGE_4_G);
   mpu.setGyroRange(MPU6050_RANGE_500_DEG);
   mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);
+  Serial.println("MPU6050 configured successfully");
 
   // ベースライン取得（初期姿勢）
+  Serial.println("Step 5: Reading baseline data...");
   delay(500);
   readIMU(&baselineData);
   Serial.printf("Baseline: pitch=%.1f roll=%.1f\n", 
                 baselineData.pitch, baselineData.roll);
 
   // BLE 初期化
+  Serial.println("Step 6: Initializing BLE...");
   setupBLE();
 
-  Serial.println("Setup complete. Waiting for BLE connection...");
+  Serial.println("\n=== Setup complete ===");
+  Serial.println("Waiting for BLE connection...");
+  Serial.println("Sensor data will be displayed every second.\n");
 }
 
 // ========== BLE セットアップ ==========
