@@ -146,10 +146,10 @@ void setup() {
   delay(10);
   
   Wire.begin(SDA_PIN, SCL_PIN);
-  Wire.setClock(100000);  // 100kHz (標準速度)
+  Wire.setClock(50000);  // 50kHz (低速モード)
   Serial.printf("I2C initialized on D4(pin %d, SDA) / D5(pin %d, SCL)\n", SDA_PIN, SCL_PIN);
-  Serial.println("Internal pullups enabled, clock set to 100kHz");
-  delay(100);
+  Serial.println("Internal pullups enabled, clock set to 50kHz");
+  delay(200);
   
   // I2Cスキャン
   Serial.println("Step 2: Scanning I2C bus...");
@@ -169,20 +169,19 @@ void setup() {
   
   // MPU6050 初期化 (0x68で試行)
   Serial.println("Step 3: Initializing MPU6050 at 0x68...");
-  if (!mpu.begin(0x68)) {
+  
+  // Wire オブジェクトを明示的に渡して初期化
+  if (!mpu.begin(0x68, &Wire)) {
     Serial.println("Failed at 0x68, trying 0x69...");
-    if (!mpu.begin(0x69)) {
-      Serial.println("ERROR: MPU6050 not found at 0x68 or 0x69!");
-      Serial.println("Check:");
-      Serial.println("  - MPU6050 VCC -> XIAO 3.3V");
-      Serial.println("  - MPU6050 GND -> XIAO GND");
-      Serial.println("  - MPU6050 SDA -> XIAO D4");
-      Serial.println("  - MPU6050 SCL -> XIAO D5");
-      Serial.println("  - MPU6050 AD0 -> GND (for 0x68) or 3.3V (for 0x69)");
-      Serial.println("  - Check if pullup resistors are needed");
-      while (1) delay(10);
+    if (!mpu.begin(0x69, &Wire)) {
+      Serial.println("ERROR: MPU6050 library initialization failed!");
+      Serial.println("But I2C device was detected at 0x68.");
+      Serial.println("Trying to continue anyway...");
+      // エラーで止めずに続行してみる
+      delay(1000);
+    } else {
+      Serial.println("MPU6050 initialized at 0x69");
     }
-    Serial.println("MPU6050 initialized at 0x69");
   } else {
     Serial.println("MPU6050 initialized at 0x68");
   }
