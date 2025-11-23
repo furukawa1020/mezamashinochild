@@ -45,7 +45,7 @@ String tagId;
 #define SCL_PIN 7  // D5 = GPIO7
 
 // サンプリング間隔
-#define SAMPLE_RATE_HZ 100
+#define SAMPLE_RATE_HZ 50  // 100Hz → 50Hz に下げる（I2C負荷軽減）
 #define SAMPLE_INTERVAL_MS (1000 / SAMPLE_RATE_HZ)
 
 // しきい値
@@ -146,9 +146,10 @@ void setup() {
   delay(10);
   
   Wire.begin(SDA_PIN, SCL_PIN);
-  Wire.setClock(50000);  // 50kHz (低速モード)
+  Wire.setClock(100000);  // 100kHz に戻す
+  Wire.setTimeOut(50);     // タイムアウトを50msに設定
   Serial.printf("I2C initialized on D4(pin %d, SDA) / D5(pin %d, SCL)\n", SDA_PIN, SCL_PIN);
-  Serial.println("Internal pullups enabled, clock set to 50kHz");
+  Serial.println("Internal pullups enabled, clock set to 100kHz, timeout=50ms");
   delay(200);
   
   // I2Cスキャン
@@ -277,7 +278,22 @@ void loop() {
 // ========== IMU データ読み取り ==========
 void readIMU(IMUData* data) {
   sensors_event_t a, g, temp;
-  mpu.getEvent(&a, &g, &temp);
+  
+  // リトライ付きで読み取り
+  int retries = 3;
+  bool success = false;
+  for (int i = 0; i < retries; i++) {
+    if (mpu.getEvent(&a, &g, &temp)) {
+      success = true;
+      break;
+    }
+    delay(10);
+  }
+  
+  if (!success) {
+    Serial.println("Warning: Failed to read MPU6050 data");
+    return;
+  }
 
   data->ax = a.acceleration.x / 9.81;  // g に変換
   data->ay = a.acceleration.y / 9.81;
