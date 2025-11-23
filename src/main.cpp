@@ -120,8 +120,9 @@ class ServerCallbacks : public BLEServerCallbacks {
 // ========== セットアップ ==========
 void setup() {
   Serial.begin(115200);
-  delay(1000);
-  Serial.println("\n=== Mezamashi Relay BLE Sensor ===");
+  delay(2000);  // シリアル接続を待つ
+  Serial.println("\n\n=== Mezamashi Relay BLE Sensor ===");
+  Serial.println("Starting setup...");
 
   // MACアドレスから一意なIDを生成
   uint8_t mac[6];
@@ -137,11 +138,13 @@ void setup() {
   Serial.printf("Tag ID: %s\n", tagId.c_str());
 
   // I2C 初期化 (D4=SDA, D5=SCL)
+  Serial.println("Step 1: Initializing I2C...");
   Wire.begin(SDA_PIN, SCL_PIN);
   Serial.printf("I2C initialized on D4(pin %d, SDA) / D5(pin %d, SCL)\n", SDA_PIN, SCL_PIN);
+  delay(100);
   
   // I2Cスキャン
-  Serial.println("Scanning I2C bus...");
+  Serial.println("Step 2: Scanning I2C bus...");
   byte count = 0;
   for (byte i = 1; i < 127; i++) {
     Wire.beginTransmission(i);
@@ -157,7 +160,7 @@ void setup() {
   }
   
   // MPU6050 初期化 (0x68で試行)
-  Serial.println("Initializing MPU6050 at 0x68...");
+  Serial.println("Step 3: Initializing MPU6050 at 0x68...");
   if (!mpu.begin(0x68)) {
     Serial.println("Failed at 0x68, trying 0x69...");
     if (!mpu.begin(0x69)) {
