@@ -139,8 +139,16 @@ void setup() {
 
   // I2C 初期化 (D4=SDA, D5=SCL)
   Serial.println("Step 1: Initializing I2C...");
+  
+  // 内部プルアップを有効化
+  pinMode(SDA_PIN, INPUT_PULLUP);
+  pinMode(SCL_PIN, INPUT_PULLUP);
+  delay(10);
+  
   Wire.begin(SDA_PIN, SCL_PIN);
+  Wire.setClock(100000);  // 100kHz (標準速度)
   Serial.printf("I2C initialized on D4(pin %d, SDA) / D5(pin %d, SCL)\n", SDA_PIN, SCL_PIN);
+  Serial.println("Internal pullups enabled, clock set to 100kHz");
   delay(100);
   
   // I2Cスキャン
